@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tiny Tiles</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #FAF7F2; font-family: Georgia, 'Times New Roman', serif; min-height: 100vh; }
+
+    /* NAV */
+    nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 40px; }
+    .logo { font-size: 20px; font-style: italic; letter-spacing: 0.08em; color: #2C2416; }
+    .nav-cta { background: none; border: 1.5px solid #2C2416; border-radius: 100px; padding: 8px 20px; font-size: 14px; cursor: pointer; color: #2C2416; font-family: inherit; letter-spacing: 0.03em; }
+
+    /* HERO */
+    .hero { text-align: center; padding: 60px 24px 40px; }
+    .hero-tag { display: inline-block; font-size: 12px; letter-spacing: 0.15em; color: #8C7355; text-transform: uppercase; margin-bottom: 24px; font-family: 'Helvetica Neue', sans-serif; }
+    .hero-title { font-size: clamp(48px, 8vw, 80px); line-height: 1.1; color: #2C2416; margin-bottom: 24px; font-weight: 400; }
+    .hero-em { color: #C9A84C; font-style: italic; }
+    .hero-sub { font-size: 18px; line-height: 1.6; color: #6B5740; max-width: 480px; margin: 0 auto 36px; font-family: 'Helvetica Neue', sans-serif; font-weight: 300; }
+    .hero-cta { background: #2C2416; color: #FAF5ED; border: none; border-radius: 100px; padding: 16px 40px; font-size: 16px; cursor: pointer; font-family: inherit; letter-spacing: 0.05em; display: block; margin: 0 auto 16px; }
+    .hero-note { font-size: 13px; color: #8C7355; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* HOW IT WORKS */
+    .cards3 { display: flex; gap: 20px; max-width: 860px; margin: 40px auto; padding: 0 24px; flex-wrap: wrap; justify-content: center; }
+    .card3 { flex: 1 1 220px; background: #fff; border-radius: 20px; padding: 32px 28px; box-shadow: 0 2px 20px rgba(44,36,22,0.07); }
+    .card3-icon { font-size: 32px; margin-bottom: 16px; }
+    .card3-title { font-size: 17px; font-weight: 600; color: #2C2416; margin-bottom: 8px; font-family: 'Helvetica Neue', sans-serif; }
+    .card3-desc { font-size: 14px; color: #6B5740; line-height: 1.5; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* QUOTE */
+    .quote-block { background: #2C2416; border-radius: 24px; padding: 40px 48px; max-width: 600px; margin: 20px auto 40px; text-align: center; }
+    .quote-text { font-size: 20px; color: #FAF5ED; line-height: 1.6; font-style: italic; margin-bottom: 16px; }
+    .quote-author { font-size: 13px; color: #C9A84C; letter-spacing: 0.08em; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* FOOTER */
+    footer { display: flex; justify-content: space-between; align-items: center; padding: 24px 40px; border-top: 1px solid #E8D5A3; flex-wrap: wrap; gap: 12px; }
+    .footer-note { font-size: 13px; color: #8C7355; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* STEPS */
+    .page { display: none; }
+    .page.active { display: block; }
+    .step-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 32px; border-bottom: 1px solid #E8D5A3; }
+    .back-btn { background: none; border: none; color: #6B5740; font-size: 14px; cursor: pointer; font-family: 'Helvetica Neue', sans-serif; }
+    .step-pips { display: flex; gap: 24px; align-items: center; }
+    .pip { display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.3; }
+    .pip.active { opacity: 1; }
+    .pip.done { opacity: 0.6; }
+    .pip-dot { width: 8px; height: 8px; border-radius: 50%; background: #C9A84C; }
+    .pip-label { font-size: 11px; color: #2C2416; letter-spacing: 0.06em; font-family: 'Helvetica Neue', sans-serif; text-transform: uppercase; }
+    .step-content { max-width: 640px; margin: 0 auto; padding: 40px 24px 80px; }
+    .step-title { font-size: 36px; color: #2C2416; font-weight: 400; margin-bottom: 8px; }
+    .step-sub { font-size: 15px; color: #6B5740; margin-bottom: 32px; font-family: 'Helvetica Neue', sans-serif; line-height: 1.5; }
+
+    /* UPLOAD */
+    .dropzone { border: 2px dashed #C9A84C; border-radius: 20px; padding: 48px 24px; text-align: center; cursor: pointer; margin-bottom: 24px; }
+    .drop-icon { font-size: 32px; margin-bottom: 12px; color: #C9A84C; }
+    .drop-text { font-size: 16px; color: #2C2416; margin-bottom: 6px; }
+    .drop-note { font-size: 13px; color: #8C7355; font-family: 'Helvetica Neue', sans-serif; }
+    .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .photo-thumb { aspect-ratio: 1; border-radius: 12px; overflow: hidden; cursor: pointer; border: 2px solid transparent; position: relative; }
+    .photo-thumb.selected { border-color: #C9A84C; box-shadow: 0 0 0 3px rgba(201,168,76,0.25); }
+    .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .thumb-check { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; background: #C9A84C; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; font-weight: 700; }
+    .selection-note { font-size: 13px; color: #8C7355; text-align: center; margin-bottom: 24px; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* CONFIGURE */
+    .section-label { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #8C7355; margin-bottom: 14px; margin-top: 28px; font-family: 'Helvetica Neue', sans-serif; }
+    .name-input { width: 100%; border: 1.5px solid #E8D5A3; border-radius: 12px; padding: 14px 16px; font-size: 16px; font-family: inherit; color: #2C2416; background: #fff; outline: none; }
+    .option-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .option-card { flex: 1 1 160px; border: 1.5px solid #E8D5A3; border-radius: 16px; padding: 20px 16px; cursor: pointer; background: #fff; }
+    .option-card.active { border-color: #C9A84C; box-shadow: 0 0 0 3px rgba(201,168,76,0.15); background: #FFFCF5; }
+    .option-icon { font-size: 24px; margin-bottom: 10px; }
+    .option-name { font-size: 15px; font-weight: 600; color: #2C2416; margin-bottom: 4px; font-family: 'Helvetica Neue', sans-serif; }
+    .option-desc { font-size: 12px; color: #8C7355; line-height: 1.4; font-family: 'Helvetica Neue', sans-serif; }
+    .size-row { display: flex; gap: 12px; }
+    .size-card { flex: 1; border: 1.5px solid #E8D5A3; border-radius: 14px; padding: 16px 12px; cursor: pointer; text-align: center; background: #fff; }
+    .size-card.active { border-color: #C9A84C; box-shadow: 0 0 0 3px rgba(201,168,76,0.15); background: #FFFCF5; }
+    .size-name { font-size: 15px; font-weight: 600; color: #2C2416; font-family: 'Helvetica Neue', sans-serif; margin-bottom: 4px; }
+    .size-desc { font-size: 11px; color: #8C7355; font-family: 'Helvetica Neue', sans-serif; margin-bottom: 8px; }
+    .size-price { font-size: 18px; color: #C9A84C; font-weight: 600; font-family: 'Helvetica Neue', sans-serif; }
+    .theme-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .theme-chip { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 100px; border: 1.5px solid; cursor: pointer; }
+    .theme-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .theme-label { font-size: 13px; color: #2C2416; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* BUTTONS */
+    .cta-btn { width: 100%; background: #2C2416; color: #FAF5ED; border: none; border-radius: 100px; padding: 18px 32px; font-size: 16px; cursor: pointer; font-family: inherit; letter-spacing: 0.04em; margin-top: 8px; }
+    .cta-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* PREVIEW */
+    .preview-toggle { display: flex; gap: 8px; margin-bottom: 24px; }
+    .toggle-btn { flex: 1; padding: 10px; border: 1.5px solid #E8D5A3; border-radius: 100px; background: #fff; cursor: pointer; font-size: 14px; font-family: inherit; color: #6B5740; }
+    .toggle-btn.active { background: #2C2416; color: #FAF5ED; border-color: #2C2416; }
+    .preview-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px; border-radius: 20px; margin-bottom: 12px; }
+    .card-wrap { aspect-ratio: 1; cursor: pointer; perspective: 400px; }
+    .game-card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.4s; border-radius: 12px; }
+    .game-card.flipped { transform: rotateY(180deg); }
+    .card-face { position: absolute; inset: 0; border-radius: 12px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    .card-back { background: #fff; border: 2px solid #E8D5A3; }
+    .card-back-pattern { width: 70%; height: 70%; border: 1.5px solid #C9A84C; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #C9A84C; }
+    .card-front { transform: rotateY(180deg); background: #eee; }
+    .card-front img { width: 100%; height: 100%; object-fit: cover; }
+    .card-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .matched-msg { text-align: center; font-size: 18px; color: #2C2416; padding: 12px; font-style: italic; }
+    .preview-note { text-align: center; font-size: 13px; color: #8C7355; margin-bottom: 24px; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* BOX PREVIEW */
+    .box-preview { border-radius: 20px; border: 1.5px solid #E8D5A3; overflow: hidden; max-width: 320px; margin: 0 auto 24px; }
+    .box-lid { padding: 40px 32px 32px; text-align: center; }
+    .box-title { font-size: 28px; color: #fff; font-style: italic; margin-bottom: 4px; }
+    .box-subtitle { font-size: 13px; color: rgba(255,255,255,0.7); letter-spacing: 0.1em; text-transform: uppercase; font-family: 'Helvetica Neue', sans-serif; }
+    .box-icon { font-size: 28px; color: rgba(255,255,255,0.5); margin-top: 16px; }
+    .box-body { padding: 20px 32px; display: flex; flex-direction: column; gap: 6px; }
+    .box-detail { font-size: 13px; color: #6B5740; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* ORDER SUMMARY */
+    .order-summary { border: 1px solid #E8D5A3; border-radius: 16px; padding: 20px 24px; margin-bottom: 16px; background: #fff; }
+    .summary-row { display: flex; justify-content: space-between; font-size: 15px; color: #2C2416; margin-bottom: 10px; font-family: 'Helvetica Neue', sans-serif; }
+    .summary-light { color: #8C7355; font-size: 14px; }
+    .summary-total { border-top: 1px solid #E8D5A3; padding-top: 10px; margin-top: 4px; font-weight: 700; font-size: 17px; }
+    .trust-row { display: flex; justify-content: center; gap: 20px; font-size: 12px; color: #8C7355; flex-wrap: wrap; margin-top: 16px; font-family: 'Helvetica Neue', sans-serif; }
+
+    /* CONFIRM */
+    .confirm-wrap { max-width: 480px; margin: 80px auto; text-align: center; padding: 0 24px; }
+    .confirm-icon { font-size: 56px; margin-bottom: 20px; }
+    .confirm-title { font-size: 36px; color: #2C2416; font-weight: 400; margin-bottom: 16px; }
+    .confirm-text { font-size: 16px; color: #6B5740; line-height: 1.6; margin-bottom: 24px; font-family: 'Helvetica Neue', sans-serif; }
+    .confirm-detail { background: #fff; border: 1px solid #E8D5A3; border-radius: 16px; padding: 20px 24px; font-size: 15px; color: #2C2416; line-height: 1.8; margin-bottom: 32px; font-family: 'Helvetica Neue', sans-serif; }
+  </style>
+</head>
+<body>
+
+  <!-- LANDING -->
+  <div id="page-landing" class="page active">
+    <nav>
+      <span class="logo">tiny tiles</span>
+      <button class="nav-cta" onclick="goTo('upload')">Create yours →</button>
+    </nav>
+    <div class="hero">
+      <div class="hero-tag">✦ Personalised · Printed · Posted</div>
+      <h1 class="hero-title">Their face.<br><em class="hero-em">Their game.</em></h1>
+      <p class="hero-sub">Turn your favourite photos into beautiful memory games, puzzles and card sets — printed on premium card and delivered to your door.</p>
+      <button class="hero-cta" onclick="goTo('upload')">Start creating</button>
+      <div class="hero-note">Takes 3 minutes · From £24</div>
+    </div>
+    <div class="cards3">
+      <div class="card3"><div class="card3-icon">📸</div><div class="card3-title">Upload photos</div><div class="card3-desc">From your camera roll, or pick moments from videos</div></div>
+      <div class="card3"><div class="card3-icon">🎨</div><div class="card3-title">Choose your game</div><div class="card3-desc">Memory pairs, Snap, or a bespoke puzzle</div></div>
+      <div class="card3"><div class="card3-icon">📦</div><div class="card3-title">We print & post</div><div class="card3-desc">Premium card stock, gift-boxed and ready to play</div></div>
+    </div>
+    <div class="quote-block">
+      <div class="quote-text">"He spent 20 minutes just staring at himself on the cards. Best £34 I've ever spent."</div>
+      <div class="quote-author">— Priya, mum of Leo, 2</div>
+    </div>
+    <footer>
+      <span class="logo">tiny tiles</span>
+      <span class="footer-note">Made with love · Shipped from the UK · Also available in Turkey 🇹🇷</span>
+    </footer>
+  </div>
+
+  <!-- UPLOAD -->
+  <div id="page-upload" class="page">
+    <div class="step-header">
+      <button class="back-btn" onclick="goTo('landing')">← Back</button>
+      <div class="step-pips">
+        <div class="pip active"><div class="pip-dot"></div><div class="pip-label">Upload</div></div>
+        <div class="pip"><div class="pip-dot"></div><div class="pip-label">Customise</div></div>
+        <div class="pip"><div class="pip-dot"></div><div class="pip-label">Preview</div></div>
+      </div>
+      <span class="logo">tiny tiles</span>
+    </div>
+    <div class="step-content">
+      <h2 class="step-title">Add your photos</h2>
+      <p class="step-sub">Upload 4–8 of your favourite moments. Clear faces work best.</p>
+      <div class="dropzone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" multiple accept="image/*" style="display:none" onchange="handleFiles(this.files)">
+        <div class="drop-icon">⬆</div>
+        <div class="drop-text">Drop photos here or tap to browse</div>
+        <div class="drop-note">JPG, PNG, HEIC · Up to 20 photos</div>
+      </div>
+      <div id="photo-grid" class="photo-grid"></div>
+      <div id="selection-note" class="selection-note" style="display:none"></div>
+      <button class="cta-btn" id="upload-next" disabled onclick="goTo('configure')">Next: Choose your game →</button>
+    </div>
+  </div>
+
+  <!-- CONFIGURE -->
+  <div id="page-configure" class="page">
+    <div class="step-header">
+      <button class="back-btn" onclick="goTo('upload')">← Back</button>
+      <div class="step-pips">
+        <div class="pip done"><div class="pip-dot"></div><div class="pip-label">Upload</div></div>
+        <div class="pip active"><div class="pip-dot"></div><div class="pip-label">Customise</div></div>
+        <div class="pip"><div class="pip-dot"></div><div class="pip-label">Preview</div></div>
+      </div>
+      <span class="logo">tiny tiles</span>
+    </div>
+    <div class="step-content">
+      <h2 class="step-title">Make it yours</h2>
+      <div class="section-label">Child's name (for the box)</div>
+      <input class="name-input" id="childName" placeholder="e.g. Arlo's Memory Game">
+      <div class="section-label">Game type</div>
+      <div class="option-row">
+        <div class="option-card active" id="game-memory" onclick="selectGame('memory')"><div class="option-icon">◈</div><div class="option-name">Memory Game</div><div class="option-desc">Flip & match pairs — a classic for ages 2+</div></div>
+        <div class="option-card" id="game-snap" onclick="selectGame('snap')"><div class="option-icon">⚡</div><div class="option-name">Snap Cards</div><div class="option-desc">Fast-paced fun with their favourite little face</div></div>
+        <div class="option-card" id="game-puzzle" onclick="selectGame('puzzle')"><div class="option-icon">⬡</div><div class="option-name">Photo Puzzle</div><div class="option-desc">A single magical moment, pieced together</div></div>
+      </div>
+      <div class="section-label">Size & card count</div>
+      <div class="size-row">
+        <div class="size-card" id="size-small" onclick="selectSize('small',24)"><div class="size-name">Small</div><div class="size-desc">16 cards · 6×6cm</div><div class="size-price">£24</div></div>
+        <div class="size-card active" id="size-medium" onclick="selectSize('medium',34)"><div class="size-name">Medium</div><div class="size-desc">24 cards · 8×8cm</div><div class="size-price">£34</div></div>
+        <div class="size-card" id="size-large" onclick="selectSize('large',44)"><div class="size-name">Large</div><div class="size-desc">32 cards · 10×10cm</div><div class="size-price">£44</div></div>
+      </div>
+      <div class="section-label">Card theme</div>
+      <div class="theme-row">
+        <div class="theme-chip active" id="theme-cream" onclick="selectTheme('cream','#FAF5ED','#C9A84C','#E8D5A3')" style="background:#FAF5ED;border-color:#C9A84C;"><div class="theme-dot" style="background:#C9A84C"></div><span class="theme-label">Cream & Gold</span></div>
+        <div class="theme-chip" id="theme-sage" onclick="selectTheme('sage','#F0F4EF','#8FAF89','#C5D9C2')" style="background:#F0F4EF;border-color:#C5D9C2;"><div class="theme-dot" style="background:#8FAF89"></div><span class="theme-label">Sage & Blush</span></div>
+        <div class="theme-chip" id="theme-dusk" onclick="selectTheme('dusk','#F5EEF2','#C47DA0','#E2C4D6')" style="background:#F5EEF2;border-color:#E2C4D6;"><div class="theme-dot" style="background:#C47DA0"></div><span class="theme-label">Dusk & Rose</span></div>
+        <div class="theme-chip" id="theme-slate" onclick="selectTheme('slate','#EEF0F4','#6B82A8','#C0CADE')" style="background:#EEF0F4;border-color:#C0CADE;"><div class="theme-dot" style="background:#6B82A8"></div><span class="theme-label">Slate & Cloud</span></div>
+      </div>
+      <button class="cta-btn" onclick="goTo('preview')">Preview your game →</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div id="page-preview" class="page">
+    <div class="step-header">
+      <button class="back-btn" onclick="goTo('configure')">← Back</button>
+      <div class="step-pips">
+        <div class="pip done"><div class="pip-dot"></div><div class="pip-label">Upload</div></div>
+        <div class="pip done"><div class="pip-dot"></div><div class="pip-label">Customise</div></div>
+        <div class="pip active"><div class="pip-dot"></div><div class="pip-label">Preview</div></div>
+      </div>
+      <span class="logo">tiny tiles</span>
+    </div>
+    <div class="step-content">
+      <h2 class="step-title" id="preview-title">Your game</h2>
+      <p class="step-sub">Here's a preview. Try flipping some cards!</p>
+      <div class="preview-toggle">
+        <button class="toggle-btn active" id="toggle-cards" onclick="switchPreview('cards')">Card preview</button>
+        <button class="toggle-btn" id="toggle-box" onclick="switchPreview('box')">Box preview</button>
+      </div>
+      <div id="cards-preview">
+        <div id="preview-board" class="preview-board" style="background:#FAF5ED"></div>
+        <div id="matched-msg" style="display:none" class="matched-msg">🎉 All matched! They'll love this.</div>
+        <div class="preview-note">Tap any card to flip it</div>
+      </div>
+      <div id="box-preview-wrap" style="display:none">
+        <div class="box-preview" id="box-preview">
+          <div class="box-lid" id="box-lid" style="background:#C9A84C">
+            <div class="box-title" id="box-title">Tiny Tiles</div>
+            <div class="box-subtitle">Memory Game</div>
+            <div class="box-icon">✦</div>
+          </div>
+          <div class="box-body">
+            <div class="box-detail" id="box-size-detail">24 cards · 8×8cm</div>
+            <div class="box-detail">Premium 350gsm card</div>
+            <div class="box-detail">Gift-ready box</div>
+          </div>
+        </div>
+      </div>
+      <div class="order-summary">
+        <div class="summary-row"><span id="summary-game">Memory Game · Medium</span><span id="summary-price">£34</span></div>
+        <div class="summary-row"><span class="summary-light">UK delivery</span><span class="summary-light">£3.95</span></div>
+        <div class="summary-row summary-total"><span>Total</span><span id="summary-total">£37.95</span></div>
+      </div>
+      <button class="cta-btn" id="order-btn" onclick="goTo('confirm')">Order now · £37.95 →</button>
+      <div class="trust-row">
+        <span>🇬🇧 Printed in the UK</span>
+        <span>📦 Ships in 3–5 days</span>
+        <span>🎁 Gift wrapping available</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM -->
+  <div id="page-confirm" class="page">
+    <div class="confirm-wrap">
+      <div class="confirm-icon">🎉</div>
+      <h2 class="confirm-title">You're all set!</h2>
+      <p class="confirm-text">In a real version, you'd be taken to checkout now. Your game would be printed and shipped within 3–5 working days.</p>
+      <div class="confirm-detail" id="confirm-detail">Your Memory Game<br>Medium · Cream & Gold theme<br>£37.95 inc. delivery</div>
+      <button class="cta-btn" onclick="resetAll()">← Start again</button>
+    </div>
+  </div>
+
+  <script>
+    // STATE
+    let photos = [];
+    let selected = [];
+    let currentGame = 'memory';
+    let currentSize = 'medium';
+    let currentPrice = 34;
+    let currentTheme = { id: 'cream', bg: '#FAF5ED', accent: '#C9A84C', border: '#E8D5A3' };
+    let flipped = [];
+    let matched = [];
+    let previewCards = [];
+
+    // NAVIGATION
+    function goTo(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      if (page === 'preview') buildPreview();
+      window.scrollTo(0, 0);
+    }
+
+    // FILES
+    function handleFiles(files) {
+      Array.from(files).filter(f => f.type.startsWith('image/')).forEach(f => {
+        const id = Math.random().toString(36).slice(2);
+        const url = URL.createObjectURL(f);
+        photos.push({ id, url });
+      });
+      renderGrid();
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('photo-grid');
+      grid.innerHTML = '';
+      photos.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'photo-thumb' + (selected.includes(p.id) ? ' selected' : '');
+        div.onclick = () => toggleSelect(p.id);
+        div.innerHTML = `<img src="${p.url}" alt=""><div class="thumb-check" style="display:${selected.includes(p.id)?'flex':'none'}">✓</div>`;
+        grid.appendChild(div);
+      });
+      const note = document.getElementById('selection-note');
+      const btn = document.getElementById('upload-next');
+      if (photos.length > 0) {
+        note.style.display = 'block';
+        note.textContent = selected.length > 0 ? `${selected.length} selected · tap to deselect` : 'Tap photos to select your favourites (up to 8)';
+        btn.disabled = false;
+      }
+    }
+
+    function toggleSelect(id) {
+      if (selected.includes(id)) {
+        selected = selected.filter(x => x !== id);
+      } else if (selected.length < 8) {
+        selected.push(id);
+      }
+      renderGrid();
+    }
+
+    // CONFIGURE
+    function selectGame(game) {
+      currentGame = game;
+      document.querySelectorAll('.option-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('game-' + game).classList.add('active');
+    }
+
+    function selectSize(size, price) {
+      currentSize = size;
+      currentPrice = price;
+      document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
+      document.getElementById('size-' + size).classList.add('active');
+    }
+
+    function selectTheme(id, bg, accent, border) {
+      currentTheme = { id, bg, accent, border };
+      document.querySelectorAll('.theme-chip').forEach(c => {
+        c.classList.remove('active');
+        c.style.borderColor = c.id === 'theme-' + id ? accent : border;
+        c.style.boxShadow = c.id === 'theme-' + id ? `0 0 0 2px ${accent}` : 'none';
+      });
+      document.getElementById('theme-' + id).classList.add('active');
+    }
+
+    // PREVIEW
+    function buildPreview() {
+      flipped = []; matched = [];
+      const name = document.getElementById('childName').value;
+      document.getElementById('preview-title').textContent = name ? `${name}'s game` : 'Your game';
+      document.getElementById('box-title').textContent = name || 'Tiny Tiles';
+      document.getElementById('box-lid').style.background = currentTheme.accent;
+
+      const gameNames = { memory: 'Memory Game', snap: 'Snap Cards', puzzle: 'Photo Puzzle' };
+      const sizeDescs = { small: '16 cards · 6×6cm', medium: '24 cards · 8×8cm', large: '32 cards · 10×10cm' };
+      const sizeLabels = { small: 'Small', medium: 'Medium', large: 'Large' };
+      const total = (currentPrice + 3.95).toFixed(2);
+
+      document.getElementById('summary-game').textContent = `${gameNames[currentGame]} · ${sizeLabels[currentSize]}`;
+      document.getElementById('summary-price').textContent = `£${currentPrice}`;
+      document.getElementById('summary-total').textContent = `£${total}`;
+      document.getElementById('order-btn').textContent = `Order now · £${total} →`;
+      document.getElementById('box-size-detail').textContent = sizeDescs[currentSize];
+
+      const gameName = gameNames[currentGame];
+      const themeName = { cream: 'Cream & Gold', sage: 'Sage & Blush', dusk: 'Dusk & Rose', slate: 'Slate & Cloud' }[currentTheme.id];
+      document.getElementById('confirm-detail').innerHTML = `<b>${name || 'Your'}'s ${gameName}</b><br>${sizeLabels[currentSize]} · ${themeName} theme<br>£${total} inc. delivery`;
+
+      buildCards();
+    }
+
+    function buildCards() {
+      const board = document.getElementById('preview-board');
+      board.style.background = currentTheme.bg;
+      board.innerHTML = '';
+      document.getElementById('matched-msg').style.display = 'none';
+
+      const pool = selected.length > 0 ? selected : photos.slice(0, 4).map(p => p.id);
+      const pairs = pool.slice(0, 4).flatMap(id => [
+        { pairId: id, photoId: id },
+        { pairId: id, photoId: id }
+      ]).sort(() => Math.random() - 0.5);
+      previewCards = pairs;
+
+      pairs.forEach((card, idx) => {
+        const photo = photos.find(p => p.id === card.photoId);
+        const wrap = document.createElement('div');
+        wrap.className = 'card-wrap';
+        wrap.onclick = () => flipCard(idx);
+        wrap.innerHTML = `
+          <div class="game-card" id="card-${idx}">
+            <div class="card-face card-back" style="border-color:${currentTheme.border}">
+              <div class="card-back-pattern" style="border-color:${currentTheme.accent};color:${currentTheme.accent}">✦</div>
+            </div>
+            <div class="card-face card-front">
+              ${photo ? `<img src="${photo.url}" alt="">` : `<div class="card-placeholder" style="background:${currentTheme.border};color:${currentTheme.accent}">★</div>`}
+            </div>
+          </div>`;
+        board.appendChild(wrap);
+      });
+    }
+
+    function flipCard(idx) {
+      if (flipped.length === 2 || flipped.includes(idx) || matched.includes(idx)) return;
+      flipped.push(idx);
+      document.getElementById('card-' + idx).classList.add('flipped');
+      if (flipped.length === 2) {
+        const [a, b] = flipped;
+        setTimeout(() => {
+          if (previewCards[a].pairId === previewCards[b].pairId) {
+            matched.push(a, b);
+            if (matched.length === previewCards.length) {
+              document.getElementById('matched-msg').style.display = 'block';
+            }
+          } else {
+            document.getElementById('card-' + a).classList.remove('flipped');
+            document.getElementById('card-' + b).classList.remove('flipped');
+          }
+          flipped = [];
+        }, 800);
+      }
+    }
+
+    function switchPreview(mode) {
+      document.getElementById('cards-preview').style.display = mode === 'cards' ? 'block' : 'none';
+      document.getElementById('box-preview-wrap').style.display = mode === 'box' ? 'block' : 'none';
+      document.getElementById('toggle-cards').classList.toggle('active', mode === 'cards');
+      document.getElementById('toggle-box').classList.toggle('active', mode === 'box');
+    }
+
+    function resetAll() {
+      photos = []; selected = []; flipped = []; matched = [];
+      document.getElementById('photo-grid').innerHTML = '';
+      document.getElementById('childName').value = '';
+      document.getElementById('upload-next').disabled = true;
+      goTo('landing');
+    }
+  </script>
+</body>
+</html>
